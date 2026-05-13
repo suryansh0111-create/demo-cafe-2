@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumière | Aesthetic Cafe</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        cafe: {
+                            cream: '#f8f7f3',
+                            charcoal: '#1e1e1e',
+                            oak: '#c9a67a',
+                            latte: '#ecebe6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        @layer base {
+            body {
+                background-color: #f8f7f3;
+                color: #1e1e1e;
+            }
+        }
+        .bold-heading {
+            line-height: 0.85;
+            font-family: "Playfair Display", serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+        .label-caps {
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        .glass-nav {
+            background-color: rgba(248, 247, 243, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(30, 30, 30, 0.05);
+        }
+        ::-selection {
+            background-color: rgba(201, 166, 122, 0.3);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = FramerMotion;
+
+        // Custom SVG Icons
+        const CoffeeIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+        );
+        const ArrowDownIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+        );
+        const MapPinIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        );
+        const ClockIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        );
+
+        const MENU_DATA = {
+            coffee: [
+                { name: "Gold Leaf Espresso", price: "5.50", desc: "Single origin beans, double shot, edible gold garnish" },
+                { name: "Lavender Honey Latte", price: "6.25", desc: "Infused with organic Provence lavender & wildflower honey" },
+                { name: "Salted Cream Cold Brew", price: "5.75", desc: "18-hour steep, house-made sea salt foam" },
+                { name: "Ceremonial Matcha", price: "6.50", desc: "Uji grade matcha with oat silk milk" },
+            ],
+            bakery: [
+                { name: "Pistachio Croissant", price: "7.00", desc: "Double baked, Sicilian pistachio cream" },
+                { name: "Charcoal Pain au Chocolat", price: "5.50", desc: "Valrhona dark chocolate, activated charcoal dough" },
+                { name: "Rose Petal Financier", price: "4.50", desc: "Brown butter cake with dried Persian roses" },
+                { name: "Sourdough Cardamom Knot", price: "5.25", desc: "Stone-ground flour, organic cardamom spice" },
+            ],
+            kitchen: [
+                { name: "Truffle Cloud Eggs", price: "16.50", desc: "Whipped egg whites, yolk confit, fresh black truffle" },
+                { name: "Saffron Salmon Tartine", price: "18.00", desc: "Cold smoked salmon, saffron labneh, pickled shallots" },
+                { name: "Mushroom Umami Bowl", price: "15.50", desc: "Wild foraged mushrooms, quinoa, miso dressing" },
+            ],
+        };
+
+        function App() {
+            const [activeCategory, setActiveCategory] = useState('coffee');
+            const [isScrolled, setIsScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => setIsScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const navLinks = [
+                { name: 'Our Story', href: '#philosophy' },
+                { name: 'Philosophy', href: '#philosophy' },
+                { name: 'The Menu', href: '#menu' },
+                { name: 'Location', href: '#location' },
+            ];
+
+            return (
+                <div className="min-h-screen">
+                    {/* Navigation */}
+                    <nav className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? 'glass-nav py-4' : 'bg-transparent py-8'}`}>
+                        <div className="max-w-7xl mx-auto px-12 flex justify-between items-center text-cafe-charcoal">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <span className="text-2xl font-[900] tracking-tighter uppercase font-serif">Lumière</span>
+                            </motion.div>
+
+                            <div className="hidden md:flex gap-10 label-caps">
+                                {navLinks.map((link) => (
+                                    <a key={link.name} href={link.href} className="opacity-40 hover:opacity-100 transition-opacity">
+                                        {link.name}
+                                    </a>
+                                ))}
+                            </div>
+
+                            <button className="px-6 py-2 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all hidden md:block">
+                                Reservations
+                            </button>
+                        </div>
+                    </nav>
+
+                    {/* Hero Section */}
+                    <section className="relative min-h-screen flex items-center px-12 pt-20 overflow-hidden bg-cafe-cream">
+                        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+                            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1 }}>
+                                <h1 className="text-[70px] md:text-[110px] bold-heading uppercase">
+                                    CRAFTED<br />
+                                    <span className="italic font-normal text-cafe-oak">Daily</span><br />
+                                    COFFEE.
+                                </h1>
+                                <p className="max-w-sm text-sm leading-relaxed opacity-70 font-medium mt-8 mb-12">
+                                    An artisanal sanctuary for the restless mind. We source single-origin beans and roast them in small batches for the perfect morning ritual.
+                                </p>
+                                
+                                <div className="relative w-full h-48 mt-20 hidden md:block">
+                                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-cafe-oak rounded-full mix-blend-multiply opacity-10" />
+                                    <div className="absolute bottom-10 left-32 w-48 h-48 bg-cafe-charcoal rounded-full" />
+                                    <div className="absolute bottom-4 left-44 w-32 h-32 border-2 border-cafe-charcoal rounded-full flex items-center justify-center">
+                                        <span className="text-[10px] font-black text-center leading-none tracking-tighter uppercase">
+                                            Roasted<br />In-House
+                                        </span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            <motion.div 
+                                initial={{ opacity: 0, y: 40 }} 
+                                animate={{ opacity: 1, y: 0 }} 
+                                transition={{ delay: 0.3, duration: 1 }}
+                                className="bg-white rounded-[40px] shadow-2xl p-10 md:p-12 flex flex-col relative z-20"
+                            >
+                                <div className="flex justify-between items-end border-b border-gray-100 pb-6 mb-8">
+                                    <h2 className="text-3xl font-serif italic tracking-tight">Seasonal Menu</h2>
+                                    <span className="label-caps opacity-40">Spring &apos;26 Edition</span>
+                                </div>
+                                
+                                <div className="space-y-10">
+                                    <section>
+                                        <h3 className="label-caps mb-6 text-cafe-oak">01. Signature Alchemy</h3>
+                                        <div className="space-y-6">
+                                            {MENU_DATA.coffee.slice(0, 3).map((item, idx) => (
+                                                <div key={idx} className="flex justify-between items-baseline">
+                                                    <div>
+                                                        <p className="font-black text-sm uppercase tracking-tight">{item.name}</p>
+                                                        <p className="text-[11px] opacity-40 italic mt-1">{item.desc}</p>
+                                                    </div>
+                                                    <span className="font-serif text-lg">${item.price}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    <section>
+                                        <h3 className="label-caps mb-6 text-cafe-oak">02. Curated Senses</h3>
+                                        <div className="space-y-6">
+                                            {MENU_DATA.bakery.slice(0, 2).map((item, idx) => (
+                                                <div key={idx} className="flex justify-between items-baseline">
+                                                    <div>
+                                                        <p className="font-black text-sm uppercase tracking-tight">{item.name}</p>
+                                                        <p className="text-[11px] opacity-40 italic mt-1">{item.desc}</p>
+                                                    </div>
+                                                    <span className="font-serif text-lg">${item.price}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </div>
+
+                                <div className="mt-12 pt-8 flex items-center gap-4 text-[10px] text-gray-400 uppercase tracking-widest font-black border-t border-gray-50">
+                                    <div className="h-[1px] flex-1 bg-gray-100"></div>
+                                    <span>Kitchen closes at 4pm daily</span>
+                                    <div className="h-[1px] flex-1 bg-gray-100"></div>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </section>
+
+                    {/* Philosophy */}
+                    <section id="philosophy" className="py-32 bg-white">
+                        <div className="max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-20 items-center">
+                            <div className="aspect-[4/5] overflow-hidden rounded-[3rem] shadow-xl">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop" 
+                                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+                                    alt="Coffee craft"
+                                />
+                            </div>
+                            <div>
+                                <span className="text-cafe-oak label-caps block mb-6">Our Ritual</span>
+                                <h2 className="text-5xl md:text-7xl bold-heading leading-tight mb-8">
+                                    Brewing <br />
+                                    With <span className="italic font-normal">Intent.</span>
+                                </h2>
+                                <p className="text-lg text-cafe-charcoal/70 leading-relaxed mb-10 font-medium">
+                                    Lumière is a dialogue between the earth and the cup. We honor the labor of farmers by treating every bean with surgical precision and artistic soul.
+                                </p>
+                                <div className="grid grid-cols-2 gap-8 py-10 border-t border-cafe-latte">
+                                    <div>
+                                        <span className="block text-3xl font-serif mb-2 italic">Direct</span>
+                                        <span className="label-caps opacity-40">Sourcing</span>
+                                    </div>
+                                    <div>
+                                        <span className="block text-3xl font-serif mb-2 italic">Daily</span>
+                                        <span className="label-caps opacity-40">Micro-lots</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Menu Detail */}
+                    <section id="menu" className="py-40 bg-cafe-cream">
+                        <div className="max-w-4xl mx-auto px-12 text-center mb-24">
+                            <span className="label-caps text-cafe-oak mb-4 block">The Full Collection</span>
+                            <h2 className="text-6xl md:text-8xl bold-heading mb-8">Curated <span className="italic font-normal">Liquids</span></h2>
+                            <div className="flex justify-center gap-12 border-b border-cafe-latte pb-4">
+                                {Object.keys(MENU_DATA).map((cat) => (
+                                    <button
+                                        key={cat}
+                                        onClick={() => setActiveCategory(cat)}
+                                        className={`label-caps pb-2 transition-all relative ${activeCategory === cat ? 'text-cafe-charcoal opacity-100' : 'opacity-30 hover:opacity-100'}`}
+                                    >
+                                        {cat}
+                                        {activeCategory === cat && (
+                                            <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-[2px] bg-cafe-charcoal" />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="max-w-4xl mx-auto px-12">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeCategory}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="grid md:grid-cols-2 gap-x-20 gap-y-12"
+                                >
+                                    {MENU_DATA[activeCategory].map((item, idx) => (
+                                        <div key={idx} className="group cursor-default border-b border-cafe-latte pb-8">
+                                            <div className="flex justify-between items-baseline mb-3">
+                                                <h3 className="text-lg font-black uppercase tracking-tight group-hover:text-cafe-oak transition-colors">{item.name}</h3>
+                                                <span className="font-serif text-lg">${item.price}</span>
+                                            </div>
+                                            <p className="text-xs leading-relaxed opacity-50 font-medium italic">{item.desc}</p>
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    </section>
+
+                    {/* Footer */}
+                    <footer id="location" className="py-40 bg-cafe-charcoal text-cafe-cream">
+                        <div className="max-w-7xl mx-auto px-12 grid md:grid-cols-3 gap-24">
+                            <div className="space-y-10">
+                                <span className="text-3xl font-black uppercase serif tracking-tighter">Lumière</span>
+                                <p className="text-cafe-cream/50 leading-relaxed font-medium text-sm">
+                                    An architectural exploration of taste. We reside at the intersection of traditional craft and modern minimalism.
+                                </p>
+                                <div className="flex gap-8 label-caps opacity-50 text-[10px]">
+                                    <span className="underline italic">Instagram</span>
+                                    <span className="underline italic">Journal</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-10">
+                                <h4 className="label-caps text-cafe-oak">The Flagship</h4>
+                                <div className="space-y-6 font-medium text-cafe-cream/70 italic text-sm">
+                                    <div className="flex items-start gap-4">
+                                        <MapPinIcon />
+                                        <p>124 Arts District West, <br />San Francisco, CA 94103</p>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <ClockIcon />
+                                        <p>Daily — 08:00 to 18:00 <br />Kitchen — Closes 16:00</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white/5 p-12 rounded-[40px] border border-white/10">
+                                <h4 className="text-2xl font-serif mb-6 italic font-normal">Private Journal</h4>
+                                <p className="text-xs opacity-50 mb-8 font-medium leading-relaxed">Join for early access to micro-lot releases and private events.</p>
+                                <div className="relative">
+                                    <input 
+                                        type="email" 
+                                        placeholder="EMAIL ADDRESS" 
+                                        className="w-full bg-transparent border-b border-white/20 pb-4 text-[10px] label-caps focus:outline-none focus:border-cafe-oak transition-colors"
+                                    />
+                                    <button className="absolute right-0 top-0 label-caps text-cafe-oak hover:text-white transition-colors">Join</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="max-w-7xl mx-auto px-12 mt-32 pt-10 border-t border-white/5 flex justify-between label-caps opacity-20">
+                            <span>© 2026 Lumière Collective</span>
+                            <span>Crafted with precision</span>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
