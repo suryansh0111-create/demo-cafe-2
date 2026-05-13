@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumière | Aesthetic Artisanal Cafe</title>
+    <title>Lumière | Artisanal Cafe</title>
     
-    <!-- Fonts: Inter & Playfair Display -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
     
-    <!-- Scripts: React, ReactDOM, Babel (for JSX), Framer Motion, and Tailwind -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/framer-motion@11.0.8/dist/framer-motion.js"></script>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
@@ -39,319 +35,269 @@
     </script>
 
     <style type="text/css">
-        html { scroll-behavior: smooth; }
-        body { background-color: #f8f7f3; color: #1e1e1e; overflow-x: hidden; }
+        @layer base {
+            body { @apply bg-cafe-cream text-cafe-charcoal font-sans antialiased overflow-x-hidden; }
+            h1, h2, h3, h4 { @apply font-serif font-black tracking-tighter uppercase; }
+        }
+
+        .bold-heading { line-height: 0.85; }
+        .label-caps { @apply text-[10px] uppercase tracking-[0.2em] font-bold; }
+        .glass-nav { @apply bg-cafe-cream/80 backdrop-blur-xl border-b border-cafe-charcoal/5; }
         
-        .bold-heading {
-            line-height: 0.85;
-            font-family: "Playfair Display", serif;
-            font-weight: 900;
-            letter-spacing: -0.05em;
+        /* Smooth Entrance Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .reveal { animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        
+        .menu-category-btn.active { @apply opacity-100 border-cafe-charcoal; }
+        .menu-category-btn.active::after { content: ''; @apply absolute bottom-0 left-0 right-0 h-[2px] bg-cafe-charcoal; }
 
-        .label-caps {
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            font-weight: 800;
-            font-size: 10px;
-        }
-
-        .glass-nav {
-            background-color: rgba(248, 247, 243, 0.8);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(30, 30, 30, 0.05);
-        }
-
-        ::-selection {
-            background-color: rgba(201, 166, 122, 0.2);
-            color: #1e1e1e;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f8f7f3; }
-        ::-webkit-scrollbar-thumb { background: #c9a67a; border-radius: 10px; }
+        html { scroll-behavior: smooth; }
+        
+        /* Image hover effect */
+        .img-zoom { @apply transition-transform duration-1000 scale-105 hover:scale-100; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { motion, AnimatePresence } = Motion; // Framer Motion uses global 'Motion' in this CDN version
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-8">
+        <div class="max-w-7xl mx-auto px-12 flex justify-between items-center text-cafe-charcoal">
+            <div class="reveal">
+                <span class="text-2xl font-black tracking-tighter uppercase font-serif">Lumière</span>
+            </div>
 
-        // Menu Data
+            <div class="hidden md:flex gap-10 label-caps">
+                <a href="#philosophy" class="opacity-40 hover:opacity-100 transition-opacity">Story</a>
+                <a href="#menu" class="opacity-40 hover:opacity-100 transition-opacity">Menu</a>
+                <a href="#location" class="opacity-40 hover:opacity-100 transition-opacity">Location</a>
+            </div>
+
+            <button class="px-6 py-2 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all hidden md:block">
+                Reservations
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center px-12 pt-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+            <div class="reveal">
+                <h1 class="text-[70px] md:text-[110px] bold-heading mb-8">
+                    CRAFTED<br />
+                    <span class="italic font-normal text-cafe-oak lowercase">Daily</span><br />
+                    COFFEE.
+                </h1>
+                <p class="max-w-sm text-sm leading-relaxed opacity-70 font-medium mb-12">
+                    An artisanal sanctuary for the restless mind. We source single-origin beans and roast them in small batches for the perfect morning ritual.
+                </p>
+                
+                <!-- Abstract Visual -->
+                <div class="relative w-full h-48 mt-20 hidden md:block">
+                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-cafe-oak rounded-full mix-blend-multiply opacity-10 animate-pulse"></div>
+                    <div class="absolute bottom-10 left-32 w-48 h-48 bg-cafe-charcoal rounded-full"></div>
+                    <div class="absolute bottom-4 left-44 w-32 h-32 border-2 border-cafe-charcoal rounded-full flex items-center justify-center">
+                        <span class="text-[10px] font-black text-center leading-none tracking-tighter uppercase">Roasted<br />In-House</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spotlight Card -->
+            <div class="reveal" style="animation-delay: 0.2s;">
+                <div class="bg-white rounded-[40px] shadow-2xl p-10 md:p-12 flex flex-col relative z-20">
+                    <div class="flex justify-between items-end border-b border-cafe-latte pb-6 mb-8">
+                        <h2 class="text-3xl font-serif italic font-normal tracking-tight normal-case">Seasonal Selection</h2>
+                        <span class="label-caps opacity-40">Series \'26</span>
+                    </div>
+                    
+                    <div class="space-y-10">
+                        <section>
+                            <h3 class="label-caps mb-6 text-cafe-oak">Signature Liquids</h3>
+                            <div class="space-y-6">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="font-black text-sm uppercase tracking-tight">Lavender Honey Latte</p>
+                                        <p class="text-[11px] opacity-40 italic mt-1">Single origin, fresh Provence lavender</p>
+                                    </div>
+                                    <span class="font-serif text-lg font-medium">$6.50</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="font-black text-sm uppercase tracking-tight">Sea Salt Cold Brew</p>
+                                        <p class="text-[11px] opacity-40 italic mt-1">18-hour steep, house foam</p>
+                                    </div>
+                                    <span class="font-serif text-lg font-medium">$5.75</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section>
+                            <h3 class="label-caps mb-6 text-cafe-oak">Curated Bites</h3>
+                            <div class="space-y-6">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="font-black text-sm uppercase tracking-tight">Pistachio Croissant</p>
+                                        <p class="text-[11px] opacity-40 italic mt-1">Twice-baked, crushed nuts</p>
+                                    </div>
+                                    <span class="font-serif text-lg font-medium">$7.00</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="mt-12 pt-8 flex items-center gap-4 text-[10px] text-gray-400 uppercase tracking-widest font-black border-t border-gray-50">
+                        <div class="h-[1px] flex-1 bg-cafe-latte"></div>
+                        <span>Kitchen Closes 4PM</span>
+                        <div class="h-[1px] flex-1 bg-cafe-latte"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy -->
+    <section id="philosophy" class="py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-20 items-center">
+            <div class="reveal overflow-hidden rounded-[3rem] shadow-xl aspect-[4/5]">
+                <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 hover:scale-100" alt="Process">
+            </div>
+            <div class="reveal" style="animation-delay: 0.3s;">
+                <span class="text-cafe-oak label-caps block mb-6">Our Ritual</span>
+                <h2 class="text-5xl md:text-7xl bold-heading leading-tight mb-8">
+                    Brewing <br />
+                    With <span class="italic font-normal lowercase">Intent.</span>
+                </h2>
+                <p class="text-lg text-cafe-charcoal/70 leading-relaxed mb-10 font-medium">
+                    Lumière is a dialogue between the earth and the cup. We treat every bean with surgical precision and artistic soul.
+                </p>
+                <div class="grid grid-cols-2 gap-8 py-10 border-t border-cafe-latte">
+                    <div>
+                        <span class="block text-3xl font-serif mb-2 italic">Direct</span>
+                        <span class="label-caps opacity-40">Sourcing</span>
+                    </div>
+                    <div>
+                        <span class="block text-3xl font-serif mb-2 italic">Daily</span>
+                        <span class="label-caps opacity-40">Small Batch</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Menu -->
+    <section id="menu" class="py-40 bg-cafe-cream">
+        <div class="max-w-4xl mx-auto px-12 text-center mb-20 reveal">
+            <span class="label-caps text-cafe-oak mb-4 block">The Full Collection</span>
+            <h2 class="text-6xl md:text-8xl bold-heading mb-8">Curated <span class="italic font-normal lowercase">Liquids</span></h2>
+            
+            <div class="flex justify-center gap-12 border-b border-cafe-latte pb-4">
+                <button onclick="switchMenu('coffee')" class="menu-category-btn label-caps pb-2 relative active transition-all opacity-30" id="btn-coffee">Coffee</button>
+                <button onclick="switchMenu('bakery')" class="menu-category-btn label-caps pb-2 relative transition-all opacity-30" id="btn-bakery">Bakery</button>
+                <button onclick="switchMenu('kitchen')" class="menu-category-btn label-caps pb-2 relative transition-all opacity-30" id="btn-kitchen">Kitchen</button>
+            </div>
+        </div>
+
+        <div id="item-grid" class="max-w-4xl mx-auto px-12 grid md:grid-cols-2 gap-x-20 gap-y-12">
+            <!-- Items loaded by JS -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="location" class="py-40 bg-cafe-charcoal text-cafe-cream">
+        <div class="max-w-7xl mx-auto px-12 grid md:grid-cols-3 gap-24">
+            <div class="space-y-10 reveal">
+                <span class="text-3xl font-black uppercase serif tracking-tighter">Lumière</span>
+                <p class="text-cafe-cream/50 leading-relaxed font-medium text-sm italic">
+                    An architectural exploration of taste. Intersection of craft and minimalism.
+                </p>
+                <div class="flex gap-8 label-caps opacity-50">
+                    <span class="underline italic cursor-pointer">Instagram</span>
+                    <span class="underline italic cursor-pointer">Journal</span>
+                </div>
+            </div>
+
+            <div class="space-y-10 reveal" style="animation-delay: 0.2s;">
+                <h4 class="label-caps text-cafe-oak">The Flagship</h4>
+                <div class="space-y-6 font-medium text-cafe-cream/70 italic text-sm">
+                    <p>124 Arts District West, <br />San Francisco, CA 94103</p>
+                    <p>Daily — 08:00 to 18:00 <br />Kitchen — Closes 16:00</p>
+                </div>
+            </div>
+
+            <div class="bg-white/5 p-12 rounded-[40px] border border-white/10 reveal" style="animation-delay: 0.4s;">
+                <h4 class="text-2xl font-serif mb-6 italic font-normal normal-case">Private Journal</h4>
+                <div class="relative">
+                    <input type="email" placeholder="EMAIL ADDRESS" class="w-full bg-transparent border-b border-white/20 pb-4 text-[10px] label-caps focus:outline-none focus:border-cafe-oak transition-colors">
+                    <button class="absolute right-0 top-0 label-caps text-cafe-oak">Join</button>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-12 mt-32 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between label-caps opacity-20">
+            <span>© 2026 Lumière Collective</span>
+            <span>Crafted with precision</span>
+        </div>
+    </footer>
+
+    <script>
         const MENU_DATA = {
             coffee: [
-                { name: "Gold Leaf Espresso", price: "5.50", desc: "Single origin beans, double shot, edible gold garnish" },
-                { name: "Lavender Honey Latte", price: "6.25", desc: "Infused with organic Provence lavender & wildflower honey" },
+                { name: "Gold Leaf Espresso", price: "5.50", desc: "Single origin beans, double shot" },
+                { name: "Lavender Honey Latte", price: "6.25", desc: "Provence lavender & wildflower honey" },
                 { name: "Salted Cream Cold Brew", price: "5.75", desc: "18-hour steep, house-made sea salt foam" },
                 { name: "Ceremonial Matcha", price: "6.50", desc: "Uji grade matcha with oat silk milk" },
             ],
             bakery: [
-                { name: "Pistachio Croissant", price: "7.00", desc: "Double baked, Sicilian pistachio cream" },
-                { name: "Charcoal Pain au Chocolat", price: "5.50", desc: "Valrhona dark chocolate, activated charcoal dough" },
-                { name: "Rose Petal Financier", price: "4.50", desc: "Brown butter cake with dried Persian roses" },
-                { name: "Sourdough Cardamom Knot", price: "5.25", desc: "Stone-ground flour, organic cardamom spice" },
+                { name: "Pistachio Croissant", price: "7.00", desc: "Double baked, Sicilian cream" },
+                { name: "Charcoal Pain Chocolat", price: "5.50", desc: "Valrhona chocolate, active charcoal" },
+                { name: "Rose Petal Financier", price: "4.50", desc: "Brown butter with dried roses" },
             ],
             kitchen: [
-                { name: "Truffle Cloud Eggs", price: "16.50", desc: "Whipped egg whites, yolk confit, fresh black truffle" },
-                { name: "Saffron Salmon Tartine", price: "18.00", desc: "Cold smoked salmon, saffron labneh, pickled shallots" },
-                { name: "Mushroom Umami Bowl", price: "15.50", desc: "Wild foraged mushrooms, quinoa, miso dressing" },
+                { name: "Truffle Cloud Eggs", price: "16.50", desc: "Whipped whites, yolk confit, fresh truffle" },
+                { name: "Saffron Salmon Tartine", price: "18.00", desc: "Cold smoked salmon, saffron labneh" },
             ],
         };
 
-        function App() {
-            const [activeCategory, setActiveCategory] = useState('coffee');
-            const [isScrolled, setIsScrolled] = useState(false);
-
-            useEffect(() => {
-                const handleScroll = () => setIsScrolled(window.scrollY > 50);
-                window.addEventListener('scroll', handleScroll);
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
-
-            return (
-                <div className="min-h-screen font-sans selection:bg-cafe-oak/30">
-                    {/* Navigation */}
-                    <nav className={`fixed w-full z-50 transition-all duration-700 ${isScrolled ? 'glass-nav py-4' : 'bg-transparent py-10'}`}>
-                        <div className="max-w-7xl mx-auto px-12 flex justify-between items-center text-cafe-charcoal">
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <span className="text-3xl font-[900] tracking-tighter uppercase font-serif">Lumière</span>
-                            </motion.div>
-
-                            <div className="hidden md:flex gap-10 label-caps opacity-70">
-                                <a href="#philosophy" className="hover:opacity-100 transition-opacity">STORY</a>
-                                <a href="#menu" className="hover:opacity-100 transition-opacity">MENU</a>
-                                <a href="#location" className="hover:opacity-100 transition-opacity">LOCATION</a>
-                            </div>
-
-                            <button className="px-8 py-2.5 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all hidden md:block">
-                                Reservations
-                            </button>
+        function switchMenu(cat) {
+            const grid = document.getElementById('item-grid');
+            const btns = document.querySelectorAll('.menu-category-btn');
+            
+            // UI Update
+            btns.forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + cat).classList.add('active');
+            
+            // Filter Data
+            grid.style.opacity = '0';
+            setTimeout(() => {
+                grid.innerHTML = MENU_DATA[cat].map(item => `
+                    <div class="group cursor-default border-b border-cafe-latte pb-8">
+                        <div class="flex justify-between items-baseline mb-3">
+                            <h3 class="text-lg font-black uppercase tracking-tight group-hover:text-cafe-oak transition-colors">${item.name}</h3>
+                            <span class="font-serif text-lg">$${item.price}</span>
                         </div>
-                    </nav>
-
-                    {/* Hero Section */}
-                    <section className="relative min-h-screen flex items-center px-12 pt-20 overflow-hidden bg-cafe-cream">
-                        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-20 items-center">
-                            <motion.div 
-                                initial={{ opacity: 0, x: -50 }} 
-                                animate={{ opacity: 1, x: 0 }} 
-                                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                            >
-                                <h1 className="text-[75px] md:text-[115px] bold-heading uppercase">
-                                    CRAFTED<br />
-                                    <span className="italic font-normal text-cafe-oak">Daily</span><br />
-                                    COFFEE.
-                                </h1>
-                                <p className="max-w-sm text-sm leading-relaxed opacity-60 font-medium mt-10 mb-14">
-                                    An artisanal sanctuary for the restless mind. We source single-origin beans and roast them in small batches for the perfect morning ritual.
-                                </p>
-                                
-                                <div className="relative w-full h-48 mt-24 hidden md:block">
-                                    <motion.div 
-                                        animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
-                                        transition={{ duration: 8, repeat: Infinity }}
-                                        className="absolute bottom-0 left-0 w-72 h-72 bg-cafe-oak rounded-full mix-blend-multiply" 
-                                    />
-                                    <div className="absolute bottom-10 left-32 w-48 h-48 bg-cafe-charcoal rounded-full" />
-                                    <div className="absolute bottom-4 left-44 w-32 h-32 border-2 border-cafe-charcoal rounded-full flex items-center justify-center bg-cafe-cream">
-                                        <span className="text-[10px] font-black text-center leading-tight tracking-tighter uppercase">
-                                            Roasted<br />In-House
-                                        </span>
-                                    </div>
-                                </div>
-                            </motion.div>
-
-                            <motion.div 
-                                initial={{ opacity: 0, y: 60 }} 
-                                animate={{ opacity: 1, y: 0 }} 
-                                transition={{ delay: 0.4, duration: 1 }}
-                                className="bg-white rounded-[50px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] p-12 md:p-14 flex flex-col relative z-20"
-                            >
-                                <div className="flex justify-between items-end border-b border-gray-100 pb-8 mb-10">
-                                    <h2 className="text-4xl font-serif italic font-normal tracking-tight">Seasonal Menu</h2>
-                                    <span className="label-caps opacity-30">Spring 2026</span>
-                                </div>
-                                
-                                <div className="space-y-12">
-                                    <section>
-                                        <h4 className="label-caps mb-8 text-cafe-oak">01. Signature Alchemy</h4>
-                                        <div className="space-y-8">
-                                            {MENU_DATA.coffee.slice(0, 3).map((item, idx) => (
-                                                <div key={idx} className="flex justify-between items-baseline group">
-                                                    <div className="pr-4">
-                                                        <p className="font-black text-sm uppercase tracking-tight group-hover:text-cafe-oak transition-colors">{item.name}</p>
-                                                        <p className="text-[11px] opacity-40 italic mt-1.5">{item.desc}</p>
-                                                    </div>
-                                                    <span className="font-serif text-xl font-medium">${item.price}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-
-                                    <section>
-                                        <h4 className="label-caps mb-8 text-cafe-oak">02. Curated Senses</h4>
-                                        <div className="space-y-8">
-                                            {MENU_DATA.bakery.slice(0, 2).map((item, idx) => (
-                                                <div key={idx} className="flex justify-between items-baseline group">
-                                                    <div className="pr-4">
-                                                        <p className="font-black text-sm uppercase tracking-tight group-hover:text-cafe-oak transition-colors">{item.name}</p>
-                                                        <p className="text-[11px] opacity-40 italic mt-1.5">{item.desc}</p>
-                                                    </div>
-                                                    <span className="font-serif text-xl font-medium">${item.price}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                </div>
-
-                                <div className="mt-14 pt-8 flex items-center gap-4 text-[10px] text-gray-300 uppercase tracking-widest font-black border-t border-gray-50">
-                                    <div className="h-[1px] flex-1 bg-gray-100"></div>
-                                    <span>Kitchen closes at 4pm daily</span>
-                                    <div className="h-[1px] flex-1 bg-gray-100"></div>
-                                </div>
-                            </motion.div>
-                        </div>
-                    </section>
-
-                    {/* Philosophy */}
-                    <section id="philosophy" className="py-40 bg-white">
-                        <div className="max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-24 items-center">
-                            <motion.div 
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1 }}
-                                className="aspect-[4/5] overflow-hidden rounded-[4rem] shadow-2xl"
-                            >
-                                <img 
-                                    src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop" 
-                                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 hover:scale-100"
-                                    alt="Lumiere Process"
-                                />
-                            </motion.div>
-                            <div className="md:pl-10">
-                                <span className="text-cafe-oak label-caps block mb-8">Our Ritual</span>
-                                <h2 className="text-6xl md:text-[85px] bold-heading leading-[0.9] mb-10">
-                                    Brewing <br />
-                                    With <span className="italic font-normal">Intent.</span>
-                                </h2>
-                                <p className="text-xl text-cafe-charcoal/70 leading-relaxed mb-14 font-medium italic">
-                                    Lumière is a dialogue between the earth and the cup. We honor the labor of farmers by treating every bean with surgical precision and artistic soul.
-                                </p>
-                                <div className="grid grid-cols-2 gap-12 py-12 border-t border-cafe-latte">
-                                    <div>
-                                        <span className="block text-4xl font-serif mb-3 italic">Direct</span>
-                                        <span className="label-caps opacity-30">Sourcing Model</span>
-                                    </div>
-                                    <div>
-                                        <span className="block text-4xl font-serif mb-3 italic">Daily</span>
-                                        <span className="label-caps opacity-30">Micro-batches</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Menu Detail */}
-                    <section id="menu" className="py-48 bg-cafe-cream">
-                        <div className="max-w-4xl mx-auto px-12 text-center mb-28">
-                            <span className="label-caps text-cafe-oak mb-6 block">Collection 2026</span>
-                            <h2 className="text-7xl md:text-[100px] bold-heading mb-12 uppercase">Curated <span className="italic font-normal">Liquids</span></h2>
-                            <div className="flex justify-center gap-16 border-b border-cafe-latte pb-6">
-                                {Object.keys(MENU_DATA).map((cat) => (
-                                    <button
-                                        key={cat}
-                                        onClick={() => setActiveCategory(cat)}
-                                        className={`label-caps pb-4 transition-all relative ${activeCategory === cat ? 'text-cafe-charcoal opacity-100' : 'opacity-20 hover:opacity-100'}`}
-                                    >
-                                        {cat}
-                                        {activeCategory === cat && (
-                                            <motion.div layoutId="underline" className="absolute bottom-[-1px] left-0 right-0 h-[3px] bg-cafe-charcoal" />
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="max-w-5xl mx-auto px-12">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeCategory}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -30 }}
-                                    transition={{ duration: 0.5, ease: "circOut" }}
-                                    className="grid md:grid-cols-2 gap-x-24 gap-y-16"
-                                >
-                                    {MENU_DATA[activeCategory].map((item, idx) => (
-                                        <div key={idx} className="group cursor-default border-b border-cafe-latte pb-10">
-                                            <div className="flex justify-between items-baseline mb-4">
-                                                <h3 className="text-xl font-[900] uppercase tracking-tight group-hover:text-cafe-oak transition-colors">{item.name}</h3>
-                                                <span className="font-serif text-2xl font-medium opacity-80">${item.price}</span>
-                                            </div>
-                                            <p className="text-sm leading-relaxed opacity-40 font-medium italic pr-10">{item.desc}</p>
-                                        </div>
-                                    ))}
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-                    </section>
-
-                    {/* Footer */}
-                    <footer id="location" className="py-48 bg-cafe-charcoal text-cafe-cream">
-                        <div className="max-w-7xl mx-auto px-12 grid md:grid-cols-3 gap-24 items-start">
-                            <div className="space-y-12">
-                                <span className="text-4xl font-[900] uppercase serif tracking-tighter">Lumière</span>
-                                <p className="text-cafe-cream/40 leading-relaxed font-medium text-base pr-10">
-                                    An architectural exploration of taste. We reside at the intersection of traditional craft and modern minimalism.
-                                </p>
-                                <div className="flex gap-10 label-caps opacity-40 text-[11px]">
-                                    <span className="underline italic cursor-pointer hover:opacity-100 transition-opacity">Instagram</span>
-                                    <span className="underline italic cursor-pointer hover:opacity-100 transition-opacity">Philosophy Journal</span>
-                                </div>
-                            </div>
-
-                            <div className="space-y-12">
-                                <h4 className="label-caps text-cafe-oak">The Flagship</h4>
-                                <div className="space-y-8 font-medium text-cafe-cream/60 italic text-base">
-                                    <div className="flex items-start gap-5">
-                                        <div className="w-5 h-5 flex-shrink-0 mt-1 opacity-50">#</div>
-                                        <p>124 Arts District West, <br />San Francisco, CA 94103</p>
-                                    </div>
-                                    <div className="flex items-start gap-5">
-                                        <div className="w-5 h-5 flex-shrink-0 mt-1 opacity-50">~</div>
-                                        <p>Daily — 08:00 to 18:00 <br />Kitchen — Closes 16:00</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white/5 p-14 rounded-[50px] border border-white/10">
-                                <h4 className="text-3xl font-serif mb-8 italic font-normal">Private Journal</h4>
-                                <p className="text-xs opacity-40 mb-10 font-medium leading-relaxed">Join our inner circle for early access to micro-lot releases and private roastings.</p>
-                                <div className="relative">
-                                    <input 
-                                        type="email" 
-                                        placeholder="EMAIL ADDRESS" 
-                                        className="w-full bg-transparent border-b border-white/20 pb-5 text-[11px] label-caps focus:outline-none focus:border-cafe-oak transition-colors"
-                                    />
-                                    <button className="absolute right-0 top-0 label-caps text-cafe-oak hover:text-white transition-opacity">Join</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="max-w-7xl mx-auto px-12 mt-40 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between gap-6 label-caps opacity-20 text-[9px]">
-                            <span>© 2026 Lumière Collective & Roasters</span>
-                            <span>A Moment of Clarity</span>
-                        </div>
-                    </footer>
-                </div>
-            );
+                        <p class="text-xs leading-relaxed opacity-50 font-medium italic">${item.desc}</p>
+                    </div>
+                `).join('');
+                grid.style.opacity = '1';
+                grid.classList.add('reveal');
+            }, 300);
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 50) {
+                nav.classList.add('glass-nav');
+                nav.style.padding = '1rem 0';
+            } else {
+                nav.classList.remove('glass-nav');
+                nav.style.padding = '2rem 0';
+            }
+        });
+
+        // Initial Load
+        window.onload = () => switchMenu('coffee');
     </script>
 </body>
 </html>
