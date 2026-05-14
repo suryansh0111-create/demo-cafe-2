@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumière Cafe | Artisanal Coffee Sanctuary</title>
+    <title>Lumière | Artisanal Coffee Sanctuary</title>
     
     <!-- Scripts -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -13,60 +13,16 @@
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap');
-
-        :root {
-            --cafe-cream: #FDFCF9;
-            --cafe-oak: #8C7851;
-            --cafe-charcoal: #1A1A1A;
-            --cafe-latte: #E8E2D9;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--cafe-cream);
-            color: var(--cafe-charcoal);
-        }
-
-        .serif { font-family: 'Playfair+Display', serif; }
-        
-        .bold-heading {
-            font-family: 'Inter', sans-serif;
-            font-weight: 900;
-            letter-spacing: -0.05em;
-        }
-
-        .label-caps {
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 700;
-            font-size: 0.7rem;
-        }
-
-        .glass-nav {
-            background: rgba(253, 252, 249, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(26, 26, 26, 0.05);
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        .float { animation: float 6s ease-in-out infinite; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    },
                     colors: {
                         cafe: {
                             cream: '#FDFCF9',
@@ -79,37 +35,65 @@
             }
         }
     </script>
+
+    <style type="text/css">
+        body {
+            background-color: #FDFCF9;
+            color: #1A1A1A;
+            overflow-x: hidden;
+        }
+        .bold-heading {
+            line-height: 0.8;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+        .label-caps {
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            font-weight: 700;
+            font-size: 10px;
+        }
+        .glass-nav {
+            background: rgba(253, 252, 249, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 26, 26, 0.05);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth transitions fallback */
+        .page-enter { opacity: 0; transform: translateY(10px); }
+        .page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+    </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
-        const Motion = window.Motion || window.FramerMotion;
-        const motion = Motion ? Motion.motion : { div: 'div', section: 'section', main: 'main', h1: 'h1', p: 'p', button: 'button', span: 'span', img: 'img' };
-        const AnimatePresence = Motion ? Motion.AnimatePresence : ({ children }) => <React.Fragment>{children}</React.Fragment>;
+        const { useState, useEffect, useMemo } = React;
+        const { motion, AnimatePresence } = window.FramerMotion || { 
+            motion: { div: 'div', section: 'section', h1: 'h1', p: 'p', button: 'button', span: 'span', img: 'img' },
+            AnimatePresence: ({children}) => <>{children}</>
+        };
 
-        if (!Motion) console.error("Motion library failed to load");
-
-        // Self-contained Icon component with SVG definitions
-        const Icon = ({ name, className = "w-6 h-6" }) => {
-            const icons = {
-                menu: <path d="M3 12h18M3 6h18M3 18h18" />,
-                x: <path d="M18 6 6 18M6 6l12 12" />,
-                'arrow-right': <path d="M5 12h14m-7-7 7 7-7 7" />,
-                'chevron-right': <path d="m9 18 6-6-6-6" />,
-                mail: <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />,
-                phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />,
-                'map-pin': <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />,
-                instagram: <rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />,
-                'external-link': <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" x2="21" y1="14" y2="3" />
-            };
+        const Icon = ({ name, className = "w-5 h-5" }) => {
+            const path = useMemo(() => {
+                const icons = {
+                    menu: <path d="M3 12h18M3 6h18M3 18h18" />,
+                    x: <path d="M18 6 6 18M6 6l12 12" />,
+                    'arrow-right': <path d="M5 12h14m-7-7 7 7-7 7" />,
+                    'chevron-right': <path d="m9 18 6-6-6-6" />,
+                    mail: <><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>,
+                    phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />,
+                    'map-pin': <><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></>,
+                    instagram: <><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></>
+                };
+                return icons[name] || null;
+            }, [name]);
 
             return (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -118,37 +102,36 @@
                     strokeLinejoin="round"
                     className={className}
                 >
-                    {icons[name] || null}
+                    {path}
                 </svg>
             );
         };
 
         const MENU_DATA = {
             "Specialty Coffee": [
-                { name: "Gold Leaf Espresso", price: "450", desc: "Single origin roasted beans, double shot, edible 24k gold garnish" },
-                { name: "Lavender Honey Latte", price: "525", desc: "Infused with organic Provence lavender & wildflower honey" },
-                { name: "Salted Cream Cold Brew", price: "475", desc: "18-hour steep, house-made sea salt foam topper" },
-                { name: "Spanish Latte", price: "420", desc: "Condensed milk sweetness with balanced espresso strength" },
-                { name: "Rosemary Charcoal Latte", price: "550", desc: "Activated charcoal, rosemary infusion, almond milk" },
+                { name: "Gold Leaf Espresso", price: "450", desc: "Single origin slow-roasted, double shot, 24k gold garnish" },
+                { name: "Lavender Honey Latte", price: "525", desc: "Organic Provence lavender & wildflower honey reduction" },
+                { name: "Salted Cream Cold Brew", price: "475", desc: "24-hour steep, house-made Himalayan sea salt foam" },
+                { name: "Spanish Cortado", price: "420", desc: "Equal parts espresso and warm condensed milk silk" },
+                { name: "Charcoal Rosemary Latte", price: "550", desc: "Activated charcoal, fresh rosemary spray, oat milk" },
             ],
             "Teas & Matcha": [
-                { name: "Ceremonial Matcha", price: "590", desc: "Grade A Uji matcha whisked with oat silk milk" },
-                { name: "Persian Rose Tea", price: "380", desc: "Dried Iranian roses, hand-plucked tea leaves" },
-                { name: "Butterfly Pea Lemonade", price: "350", desc: "Color-changing botanical tea with fresh citrus" },
-                { name: "Smoked Oolong", price: "440", desc: "Traditional charcoal-fired tea from Wuyi mountains" },
+                { name: "Uji Ceremonial Matcha", price: "590", desc: "First-harvest grade matcha whisked to perfection" },
+                { name: "Persian Rose Infusion", price: "380", desc: "Hand-picked Iranian red roses with white tea silver needles" },
+                { name: "Butterfly Pea Lemonade", price: "350", desc: "Ph-reactive botanical tea served over crystalline ice" },
+                { name: "Monsoon Malabar Chai", price: "320", desc: "Traditional spices with aged Malabaar coast tea leaves" }
             ],
             "Artisanal Bakery": [
-                { name: "Pistachio Croissant", price: "320", desc: "Double baked, Sicilian pistachio cream filling" },
-                { name: "Charcoal Pain au Chocolat", price: "280", desc: "Valrhona 70% dark chocolate, activated charcoal dough" },
-                { name: "Truffle Cheese Danish", price: "450", desc: "Flaky pastry, black truffle honey, aged gruyère" },
-                { name: "Sourdough Cardamom Knot", price: "260", desc: "Stone-ground flour, organic cardamom spice" },
+                { name: "Saffron Pistachio Croissant", price: "320", desc: "Twice-baked with Persian saffron and Sicilian nuts" },
+                { name: "Charcoal Pain au Chocolat", price: "280", desc: "Valrhona 70% dark chocolate with activated carbon dough" },
+                { name: "Truffle Cheese Danish", price: "450", desc: "Wild truffle honey glaze over aged French Gruyère" },
+                { name: "Blueberry Cardamom Swirl", price: "340", desc: "House blueberry compote with organic Kerala cardamom" }
             ],
             "All-Day Brunch": [
-                { name: "Truffle Cloud Eggs", price: "850", desc: "Whipped egg whites, yolk confit, fresh shaved truffle" },
-                { name: "Saffron Salmon Tartine", price: "1200", desc: "Cold smoked salmon, saffron labneh, pickled shallots" },
-                { name: "Mushroom Umami Bowl", price: "780", desc: "Wild foraged mushrooms, quinoa, miso-tahini dressing" },
-                { name: "Avocado Burrata Toast", price: "950", desc: "Hass avocado, fresh burrata, heirloom tomatoes, balsamic glaze" },
-                { name: "Brioche French Toast", price: "680", desc: "Thick cut brioche, vanilla bean cream, macerated berries" },
+                { name: "Truffle Cloud Eggs", price: "850", desc: "Aerated whites, confit yolk, fresh seasonal black truffle" },
+                { name: "Saffron Salmon Tartine", price: "1200", desc: "Smoked Norwegian salmon, saffron labneh, micro-greens" },
+                { name: "Burrata Avocado Nest", price: "950", desc: "Handmade burrata, smashed Hass avocado, heirloom tomato" },
+                { name: "Wild Mushroom Umami Bowl", price: "780", desc: "Foraged mushrooms, red quinoa, tahini miso glaze" }
             ]
         };
 
@@ -163,24 +146,26 @@
             useEffect(() => {
                 const handleScroll = () => setIsScrolled(window.scrollY > 50);
                 window.addEventListener('scroll', handleScroll);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
+            }, [currentPage]);
 
-            const pageVariants = {
-                initial: { opacity: 0, x: 20 },
-                animate: { opacity: 1, x: 0 },
-                exit: { opacity: 0, x: -20 }
+            const pageTransition = {
+                initial: { opacity: 0, y: 20 },
+                animate: { opacity: 1, y: 0 },
+                exit: { opacity: 0, y: -20 },
+                transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
             };
 
             const Nav = () => (
-                <nav className={`fixed w-full z-50 transition-all duration-700 ${isScrolled ? 'glass-nav py-4' : 'bg-transparent py-8'}`}>
-                    <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center text-cafe-charcoal">
+                <nav className={`fixed w-full z-[100] transition-all duration-700 ${isScrolled ? 'glass-nav py-4' : 'bg-transparent py-8'}`}>
+                    <div className="max-w-7xl mx-auto px-8 md:px-12 flex justify-between items-center text-cafe-charcoal">
                         <motion.div 
                             className="cursor-pointer"
                             onClick={() => setCurrentPage('Home')}
                             whileHover={{ scale: 1.05 }}
                         >
-                            <span className="text-2xl font-black tracking-tighter uppercase serif">Lumière</span>
+                            <span className="text-2xl font-black tracking-tighter uppercase font-serif">Lumière</span>
                         </motion.div>
 
                         <div className="hidden md:flex gap-10 label-caps">
@@ -188,156 +173,195 @@
                                 <button 
                                     key={page} 
                                     onClick={() => setCurrentPage(page)}
-                                    className={`transition-all ${currentPage === page ? 'opacity-100 text-cafe-oak underline underline-offset-8' : 'opacity-40 hover:opacity-100'}`}
+                                    className={`transition-all relative group ${currentPage === page ? 'text-cafe-oak opacity-100 font-bold' : 'opacity-40 hover:opacity-100'}`}
                                 >
                                     {page}
+                                    <span className={`absolute -bottom-2 left-0 w-full h-[1px] bg-cafe-oak transition-transform duration-500 scale-x-0 group-hover:scale-x-100 origin-left ${currentPage === page ? 'scale-x-100' : ''}`} />
                                 </button>
                             ))}
                         </div>
 
-                        <button 
-                            className="md:hidden text-cafe-charcoal"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            {isMenuOpen ? <Icon name="x" /> : <Icon name="menu" />}
-                        </button>
-
-                        <button className="hidden md:block px-6 py-2 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all uppercase">
-                            Reservations
-                        </button>
+                        <div className="flex items-center gap-4">
+                            <button className="hidden md:block px-6 py-2 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all uppercase">
+                                Reservations
+                            </button>
+                            <button 
+                                className="md:hidden text-cafe-charcoal p-2"
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            >
+                                {isMenuOpen ? <Icon name="x" className="w-8 h-8" /> : <Icon name="menu" className="w-8 h-8" />}
+                            </button>
+                        </div>
                     </div>
                 </nav>
             );
 
-            const Home = () => (
-                <div className="pt-20">
-                    <section className="relative min-h-[90vh] flex items-center px-6 md:px-12 overflow-hidden">
+            const MobileDrawer = () => (
+                <AnimatePresence>
+                    {isMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, x: '100%' }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed inset-0 z-[110] bg-cafe-cream flex flex-col p-12"
+                        >
+                            <button className="self-end mb-20 p-2" onClick={() => setIsMenuOpen(false)}>
+                                <Icon name="x" className="w-10 h-10" />
+                            </button>
+                            <div className="flex flex-col gap-8">
+                                {PAGES.map((page) => (
+                                    <button 
+                                        key={page} 
+                                        onClick={() => { setCurrentPage(page); setIsMenuOpen(false); }}
+                                        className="text-6xl font-black uppercase tracking-tighter text-left group"
+                                    >
+                                        <span className={`transition-all duration-500 ${currentPage === page ? 'text-cafe-oak italic' : 'opacity-30'}`}>{page}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            );
+
+            const HomePage = () => (
+                <motion.div {...pageTransition}>
+                    <section className="relative min-h-screen flex items-center px-12 pt-20 overflow-hidden">
                         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
-                            <motion.div
-                                initial={{ opacity: 0, x: -50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 1.2 }}
-                            >
-                                <h1 className="text-[60px] md:text-[120px] bold-heading uppercase leading-[0.8] mb-8">
-                                    A Taste of<br />
-                                    <span className="italic font-normal text-cafe-oak">Heaven</span><br />
+                            <div>
+                                <motion.h1 
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-[80px] md:text-[140px] bold-heading uppercase tracking-tighter leading-[0.75] mb-10"
+                                >
+                                    BREW<br />
+                                    <span className="italic font-normal text-cafe-oak font-serif">Aura</span><br />
                                     Daily.
-                                </h1>
+                                </motion.h1>
                                 <p className="max-w-sm text-sm leading-relaxed opacity-70 font-medium mb-12">
-                                    Lumière is an artisanal sanctuary for those who seek perfection in every sip and tranquility in every moment.
+                                    Lumière resides at the intersection of artisanal craft and modern architectural minimalism. We honor every bean from soil to cup.
                                 </p>
                                 <button 
                                     onClick={() => setCurrentPage('Menu')}
-                                    className="flex items-center gap-4 label-caps text-cafe-charcoal hover:text-cafe-oak transition-colors group"
+                                    className="flex items-center gap-4 label-caps text-cafe-charcoal hover:text-cafe-oak transition-all hover:translate-x-3 group"
                                 >
-                                    Explore the menu <Icon name="arrow-right" className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                                    Explore Menu <Icon name="arrow-right" className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                                 </button>
-                            </motion.div>
+                            </div>
 
-                            <div className="relative group">
+                            <div className="relative">
                                 <motion.div 
-                                   initial={{ opacity: 0, scale: 0.8 }}
+                                   initial={{ opacity: 0, scale: 0.9 }}
                                    animate={{ opacity: 1, scale: 1 }}
-                                   transition={{ duration: 1.5 }}
-                                   className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl relative z-10"
+                                   transition={{ duration: 1.5, ease: "easeOut" }}
+                                   className="aspect-[4/5] rounded-[4rem] overflow-hidden shadow-2xl relative z-10"
                                 >
                                     <img 
                                         src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop" 
-                                        className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
-                                        alt="Cafe Space"
+                                        className="w-full h-full object-cover transition-transform duration-[3000ms] hover:scale-110"
+                                        alt="Hero Space"
                                     />
                                 </motion.div>
-                                <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-cafe-oak/10 rounded-full blur-3xl -z-10 animate-pulse" />
+                                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-cafe-oak/5 rounded-full blur-[100px] -z-10 animate-pulse" />
                             </div>
                         </div>
                     </section>
 
-                    <section className="py-32 px-6 md:px-12">
+                    <section className="py-40 px-12 bg-white rounded-[5rem]">
                         <div className="max-w-7xl mx-auto">
-                            <div className="flex justify-between items-end mb-20">
-                                <h2 className="text-4xl md:text-6xl bold-heading">House <br /><span className="italic font-normal">Favorites</span></h2>
-                                <button onClick={() => setCurrentPage('Menu')} className="label-caps opacity-40 hover:opacity-100 flex items-center gap-2">Full Menu <Icon name="chevron-right" className="w-4 h-4" /></button>
+                            <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+                                <h2 className="text-7xl bold-heading uppercase">Curated<br /><span className="italic font-normal text-cafe-oak font-serif">Senses</span></h2>
+                                <button onClick={() => setCurrentPage('Menu')} className="label-caps opacity-40 hover:opacity-100 flex items-center gap-2 pb-2 border-b border-cafe-latte">Full Collection <Icon name="chevron-right" className="w-4 h-4" /></button>
                             </div>
-                            <div className="grid md:grid-cols-3 gap-8">
-                                {[1, 2, 3].map((i) => (
+                            <div className="grid md:grid-cols-3 gap-12">
+                                {[
+                                    { img: "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=1934&auto=format&fit=crop", name: "Gold Leaf", price: "₹450" },
+                                    { img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop", name: "Matcha Silk", price: "₹590" },
+                                    { img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop", name: "Saffron Crust", price: "₹320" }
+                                ].map((item, i) => (
                                     <motion.div 
                                         key={i}
-                                        whileHover={{ y: -10 }}
-                                        className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all"
+                                        whileHover={{ y: -15, scale: 1.02 }}
+                                        className="group cursor-pointer"
                                     >
-                                        <div className="h-64 bg-cafe-latte rounded-2xl overflow-hidden mb-6">
-                                            <img 
-                                                src={i === 1 ? "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=1934&auto=format&fit=crop" : i === 2 ? "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" : "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop"}
-                                                className="w-full h-full object-cover"
-                                                alt="Product"
-                                            />
+                                        <div className="aspect-square rounded-[3rem] overflow-hidden mb-8 shadow-sm group-hover:shadow-2xl transition-all duration-700">
+                                            <img src={item.img} className="w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-110" alt={item.name} />
                                         </div>
-                                        <h3 className="text-xl font-black uppercase tracking-tight mb-2">Signature 0{i}</h3>
-                                        <p className="text-xs opacity-50 font-medium italic mb-4">Limited seasonal batch sourced from high-altitude estates.</p>
-                                        <span className="text-cafe-oak font-bold text-lg">₹450</span>
+                                        <div className="flex justify-between items-baseline">
+                                            <h3 className="text-2xl font-black uppercase tracking-tighter">{item.name}</h3>
+                                            <span className="font-serif italic text-xl text-cafe-oak">{item.price}</span>
+                                        </div>
                                     </motion.div>
                                 ))}
                             </div>
                         </div>
                     </section>
-                </div>
+                </motion.div>
             );
 
-            const Menu = () => (
-                <div className="pt-40 px-6 md:px-12 pb-32">
-                    <div className="max-w-5xl mx-auto">
-                        <div className="text-center mb-24">
-                            <span className="label-caps text-cafe-oak mb-4 block">The Full Collection</span>
-                            <h1 className="text-7xl md:text-9xl bold-heading uppercase">Menu</h1>
-                        </div>
+            const MenuPage = () => (
+                <motion.div {...pageTransition} className="pt-40 px-12 pb-40">
+                    <div className="max-w-6xl mx-auto text-center mb-32">
+                        <span className="label-caps text-cafe-oak block mb-6">Seasonal Edition 2026</span>
+                        <h1 className="text-[100px] md:text-[180px] bold-heading uppercase leading-none">Menu</h1>
+                    </div>
 
-                        <div className="flex overflow-x-auto gap-8 md:gap-12 border-b border-cafe-latte pb-4 mb-20 no-scrollbar">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex overflow-x-auto gap-12 border-b border-cafe-latte pb-6 mb-24 no-scrollbar justify-center">
                             {Object.keys(MENU_DATA).map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
-                                    className={`label-caps whitespace-nowrap transition-all relative pb-4 ${activeCategory === cat ? 'text-cafe-charcoal opacity-100' : 'opacity-30 hover:opacity-100'}`}
+                                    className={`label-caps whitespace-nowrap transition-all relative pb-6 px-2 ${activeCategory === cat ? 'text-cafe-charcoal opacity-100 scale-110' : 'opacity-30 hover:opacity-100 hover:scale-105'}`}
                                 >
                                     {cat}
                                     {activeCategory === cat && (
-                                        <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-[2px] bg-cafe-charcoal" />
+                                        <motion.div layoutId="nav-underline" className="absolute bottom-0 left-0 right-0 h-[2px] bg-cafe-charcoal" transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} />
                                     )}
                                 </button>
                             ))}
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-x-20 gap-y-16">
+                        <div className="grid md:grid-cols-2 gap-x-24 gap-y-20">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeCategory}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.6 }}
                                     className="contents"
                                 >
                                     {MENU_DATA[activeCategory].map((item, idx) => (
-                                        <div key={idx} className="group border-b border-cafe-latte pb-10">
-                                            <div className="flex justify-between items-baseline mb-4">
-                                                <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:text-cafe-oak transition-colors">{item.name}</h3>
-                                                <span className="font-serif text-2xl font-light">₹{item.price}</span>
+                                        <motion.div 
+                                            key={idx} 
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.1 }}
+                                            className="group border-b border-cafe-latte pb-12 hover:border-cafe-oak transition-colors duration-500"
+                                        >
+                                            <div className="flex justify-between items-baseline mb-6">
+                                                <h3 className="text-3xl font-black uppercase tracking-tighter group-hover:text-cafe-oak transition-colors">{item.name}</h3>
+                                                <span className="font-serif italic text-3xl font-light">₹{item.price}</span>
                                             </div>
-                                            <p className="text-sm leading-relaxed opacity-50 font-medium italic">{item.desc}</p>
-                                        </div>
+                                            <p className="text-sm leading-relaxed opacity-50 font-medium italic group-hover:opacity-80 transition-opacity">{item.desc}</p>
+                                        </motion.div>
                                     ))}
                                 </motion.div>
                             </AnimatePresence>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             );
 
-            const Gallery = () => (
-                <div className="pt-40 px-6 md:px-12 pb-32">
+            const GalleryPage = () => (
+                <motion.div {...pageTransition} className="pt-40 px-12 pb-40">
                     <div className="max-w-7xl mx-auto">
-                        <div className="mb-24">
-                            <h1 className="text-6xl md:text-8xl bold-heading uppercase">Space <br /><span className="italic font-normal">Philosophy</span></h1>
+                        <div className="mb-32">
+                            <h1 className="text-[80px] md:text-[140px] bold-heading uppercase leading-[0.8]">The<br /><span className="italic font-normal text-cafe-oak font-serif">Visual</span><br />Dialogue</h1>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                             {[
                                 "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
                                 "https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=2070&auto=format&fit=crop",
@@ -350,141 +374,139 @@
                             ].map((url, i) => (
                                 <motion.div 
                                     key={i}
-                                    initial={{ opacity: 0 }}
-                                    whileInView={{ opacity: 1 }}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
-                                    className={`rounded-3xl overflow-hidden shadow-lg aspect-square ${i === 2 || i === 5 ? 'md:col-span-2' : ''}`}
+                                    className={`rounded-[3rem] overflow-hidden shadow-xl aspect-square relative group ${i % 3 === 0 ? 'md:col-span-2 md:aspect-video' : ''}`}
                                 >
-                                    <img src={url} className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" alt="Gallery" />
+                                    <img src={url} className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110" alt={`Visual ${i}`} />
+                                    <div className="absolute inset-0 bg-cafe-charcoal/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="label-caps text-white scale-150 font-black">View</span>
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
                     </div>
-                </div>
+                </motion.div>
             );
 
-            const About = () => (
-                <div className="pt-40 px-6 md:px-12 pb-32">
+            const AboutPage = () => (
+                <motion.div {...pageTransition} className="pt-40 px-12 pb-40">
                     <div className="max-w-4xl mx-auto">
-                        <h1 className="text-6xl md:text-8xl bold-heading uppercase mb-12">Our <br /><span className="italic font-normal">Aura</span></h1>
-                        <div className="flex flex-col gap-12 font-medium text-xl leading-relaxed text-cafe-charcoal/80">
-                            <p>Founded in 2024, Lumière was born from a singular obsession: the architecture of taste. We believe that the space you inhabit while drinking your morning coffee is just as important as the roast itself.</p>
-                            <img src="https://images.unsplash.com/photo-1600100414328-98e94553229b?q=80&w=2070&auto=format&fit=crop" className="w-full h-[500px] object-cover rounded-[3rem] my-10" alt="Founder" />
-                            <p>Our beans are selected through a rigorous process of direct trade, ensuring that the farmers who labor over the soil receive the respect and compensation they deserve.</p>
+                        <h1 className="text-[80px] md:text-[140px] bold-heading uppercase mb-16">The<br /><span className="italic font-normal text-cafe-oak font-serif">Ritual</span></h1>
+                        <div className="space-y-16">
+                            <p className="text-3xl font-serif italic text-cafe-charcoal leading-snug">
+                                We believe coffee is not just a stimulant, but a medium of pause in an accelerated world.
+                            </p>
+                            <div className="aspect-video rounded-[4rem] overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1600100414328-98e94553229b?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover" alt="Coffee Maker" />
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-12 font-medium text-lg leading-relaxed text-cafe-charcoal/70">
+                                <p>Lumière was founded on the principle of architectural precision applied to taste. Every roast curve is analyzed, every pour is timed, and every space is designed to induce clarity.</p>
+                                <p>We source through direct trade, ensuring that the legacy of the land and the labor of the farmers are honored with transparency and extreme quality premiums.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             );
 
-            const Contact = () => (
-                <div className="pt-40 px-6 md:px-12 pb-32">
-                    <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 md:gap-32 items-center">
+            const ContactPage = () => (
+                <motion.div {...pageTransition} className="pt-40 px-12 pb-40">
+                    <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-32 items-center">
                         <div>
-                            <h1 className="text-6xl md:text-8xl bold-heading uppercase mb-12">Reach <br /><span className="italic font-normal">Out</span></h1>
+                            <h1 className="text-[80px] md:text-[140px] bold-heading uppercase leading-[0.8] mb-16">Talk<br /><span className="italic font-normal text-cafe-oak font-serif">To Us</span></h1>
                             <div className="space-y-12">
-                                <div className="flex gap-6 items-center group">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                        <Icon name="mail" className="text-cafe-oak" />
+                                <div className="flex gap-8 items-center group">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+                                        <Icon name="mail" className="text-cafe-oak w-6 h-6" />
                                     </div>
                                     <div>
-                                        <span className="label-caps opacity-40">Email</span>
-                                        <p className="text-xl md:text-2xl font-serif italic">hello@lumiere.cafe</p>
+                                        <span className="label-caps opacity-40 block mb-1">Electronic Mail</span>
+                                        <p className="text-3xl font-serif italic">hello@lumiere.cafe</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-6 items-center group">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                        <Icon name="phone" className="text-cafe-oak" />
+                                <div className="flex gap-8 items-center group">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+                                        <Icon name="map-pin" className="text-cafe-oak w-6 h-6" />
                                     </div>
                                     <div>
-                                        <span className="label-caps opacity-40">Call</span>
-                                        <p className="text-xl md:text-2xl font-serif italic">+91 98765 43210</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-6 items-center group">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                        <Icon name="map-pin" className="text-cafe-oak" />
-                                    </div>
-                                    <div>
-                                        <span className="label-caps opacity-40">Flagship</span>
-                                        <p className="text-xl md:text-2xl font-serif italic">Bandra West, Mumbai</p>
+                                        <span className="label-caps opacity-40 block mb-1">Visit Flagship</span>
+                                        <p className="text-3xl font-serif italic">Bandra West, Mumbai</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl">
-                            <h2 className="text-4xl bold-heading mb-10 uppercase">Message</h2>
-                            <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
-                                <input type="text" placeholder="NAME" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors label-caps bg-transparent" />
-                                <input type="email" placeholder="EMAIL" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors label-caps bg-transparent" />
-                                <textarea placeholder="YOUR MESSAGE" rows="3" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors label-caps bg-transparent" />
-                                <button className="w-full bg-cafe-charcoal text-cafe-cream py-6 rounded-full label-caps hover:scale-105 transition-transform">Send Signal</button>
+                        <div className="bg-white p-12 md:p-16 rounded-[4rem] shadow-2xl relative">
+                            <h2 className="text-4xl bold-heading mb-12 uppercase tracking-tighter">Signal</h2>
+                            <form className="space-y-12" onSubmit={(e) => e.preventDefault()}>
+                                <motion.div className="space-y-4" whileFocus={{ y: -5 }}>
+                                    <label className="label-caps opacity-40 block text-[9px]">Identity</label>
+                                    <input type="text" placeholder="YOUR NAME" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors text-xl italic font-serif bg-transparent" />
+                                </motion.div>
+                                <motion.div className="space-y-4">
+                                    <label className="label-caps opacity-40 block text-[9px]">Portal</label>
+                                    <input type="email" placeholder="EMAIL ADDRESS" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors text-xl italic font-serif bg-transparent" />
+                                </motion.div>
+                                <motion.div className="space-y-4">
+                                    <label className="label-caps opacity-40 block text-[9px]">Statement</label>
+                                    <textarea rows={3} placeholder="MESSAGE" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors text-xl italic font-serif bg-transparent resize-none" />
+                                </motion.div>
+                                <motion.button 
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="w-full bg-cafe-charcoal text-cafe-cream py-8 rounded-full label-caps font-black uppercase text-xs tracking-widest"
+                                >
+                                    Initialize Transmission
+                                </motion.button>
                             </form>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             );
 
             return (
-                <div className="bg-cafe-cream min-h-screen selection:bg-cafe-oak/30">
+                <div className="bg-cafe-cream min-h-screen">
                     <Nav />
-                    
-                    <AnimatePresence>
-                        {isMenuOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, x: '100%' }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: '100%' }}
-                                className="fixed inset-0 z-[60] bg-cafe-cream flex flex-col p-12 md:hidden"
-                            >
-                                <button className="self-end mb-20 p-2" onClick={() => setIsMenuOpen(false)}>
-                                    <Icon name="x" className="w-10 h-10" />
-                                </button>
-                                <div className="flex flex-col gap-8">
-                                    {PAGES.map((page) => (
-                                        <button 
-                                            key={page} 
-                                            onClick={() => { setCurrentPage(page); setIsMenuOpen(false); }}
-                                            className="text-5xl bold-heading uppercase text-left"
-                                        >
-                                            <span className={`${currentPage === page ? 'text-cafe-oak italic' : 'opacity-40'}`}>{page}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    <MobileDrawer />
 
                     <AnimatePresence mode="wait">
-                        <motion.main
-                            key={currentPage}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            variants={pageVariants}
-                            transition={{ duration: 0.6 }}
-                        >
-                            {currentPage === 'Home' && <Home />}
-                            {currentPage === 'Menu' && <Menu />}
-                            {currentPage === 'Gallery' && <Gallery />}
-                            {currentPage === 'About' && <About />}
-                            {currentPage === 'Contact' && <Contact />}
-                        </motion.main>
+                        {currentPage === 'Home' && <HomePage key="home" />}
+                        {currentPage === 'Menu' && <MenuPage key="menu" />}
+                        {currentPage === 'Gallery' && <GalleryPage key="gallery" />}
+                        {currentPage === 'About' && <AboutPage key="about" />}
+                        {currentPage === 'Contact' && <ContactPage key="contact" />}
                     </AnimatePresence>
 
-                    <footer className="py-24 bg-cafe-charcoal text-cafe-cream px-6 md:px-12 mt-20">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
-                            <span className="text-3xl font-black serif uppercase tracking-tighter">Lumière</span>
-                            <div className="flex flex-wrap justify-center gap-8 md:gap-12 label-caps opacity-50">
-                                {PAGES.map(p => <button key={p} onClick={() => setCurrentPage(p)} className="hover:opacity-100 transition-opacity">{p}</button>)}
+                    <footer className="py-40 bg-cafe-charcoal text-cafe-cream px-12">
+                        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-24">
+                            <div className="col-span-2">
+                                <span className="text-4xl font-black uppercase tracking-tighter italic font-serif block mb-10">Lumière</span>
+                                <p className="text-cafe-cream/40 max-w-sm leading-relaxed font-medium text-sm">
+                                    Crafting pause in Mumbai, Bangalore, and New Delhi. Since 2024.
+                                </p>
                             </div>
-                            <div className="flex gap-6">
-                                <Icon name="instagram" className="w-5 h-5 opacity-40 hover:opacity-100 cursor-pointer" />
-                                <Icon name="external-link" className="w-5 h-5 opacity-40 hover:opacity-100 cursor-pointer" />
+                            <div>
+                                <h4 className="label-caps mb-10 text-cafe-oak">Discovery</h4>
+                                <div className="flex flex-col gap-6 label-caps text-[10px] opacity-40">
+                                    {PAGES.map(p => <button key={p} onClick={() => setCurrentPage(p)} className="text-left hover:opacity-100 hover:text-white transition-all underline decoration-transparent hover:decoration-white">{p}</button>)}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="label-caps mb-10 text-cafe-oak">Connected</h4>
+                                <div className="flex flex-col gap-6 label-caps text-[10px] opacity-40 font-bold">
+                                    <span className="hover:opacity-100 cursor-pointer underline transition-all">Instagram</span>
+                                    <span className="hover:opacity-100 cursor-pointer underline transition-all">Journal</span>
+                                    <span className="hover:opacity-100 cursor-pointer underline transition-all">Stockists</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="max-w-7xl mx-auto mt-20 pt-10 border-t border-white/5 text-center label-caps opacity-20 text-[9px]">
-                            © 2026 Lumière Collective • Mumbai • Bangalore • New Delhi
+                        <div className="max-w-7xl mx-auto mt-40 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between gap-6 label-caps opacity-20 text-[9px]">
+                            <span>© 2026 Lumière Collective Private Limited</span>
+                            <div className="flex gap-8">
+                                <span>Privacy</span>
+                                <span>Terms of Pause</span>
+                            </div>
                         </div>
                     </footer>
                 </div>
