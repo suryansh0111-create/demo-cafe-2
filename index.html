@@ -3,301 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumière | Artisanal Cafe</title>
+    <title>Lumière Cafe | Artisanal Coffee Sanctuary</title>
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
+    <!-- Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap');
+
+        :root {
+            --cafe-cream: #FDFCF9;
+            --cafe-oak: #8C7851;
+            --cafe-charcoal: #1A1A1A;
+            --cafe-latte: #E8E2D9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cafe-cream);
+            color: var(--cafe-charcoal);
+        }
+
+        .serif { font-family: 'Playfair+Display', serif; }
+        
+        .bold-heading {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .label-caps {
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+
+        .glass-nav {
+            background: rgba(253, 252, 249, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(26, 26, 26, 0.05);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .float { animation: float 6s ease-in-out infinite; }
+    </style>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        serif: ['"Playfair Display"', 'serif'],
-                        sans: ['Inter', 'sans-serif'],
-                    },
                     colors: {
                         cafe: {
-                            cream: '#f8f7f3',
-                            charcoal: '#1e1e1e',
-                            oak: '#c9a67a',
-                            latte: '#ecebe6',
+                            cream: '#FDFCF9',
+                            oak: '#8C7851',
+                            charcoal: '#1A1A1A',
+                            latte: '#E8E2D9',
                         }
                     }
                 }
             }
         }
     </script>
-
-    <style type="text/css">
-        @layer base {
-            body { @apply bg-cafe-cream text-cafe-charcoal font-sans antialiased overflow-x-hidden; }
-            h1, h2, h3, h4 { @apply font-serif font-black tracking-tighter uppercase; }
-        }
-
-        .bold-heading { line-height: 0.85; }
-        .label-caps { @apply text-[10px] uppercase tracking-[0.2em] font-bold; }
-        .glass-nav { @apply bg-cafe-cream/80 backdrop-blur-xl border-b border-cafe-charcoal/5; }
-        
-        /* Smooth Entrance Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .reveal { animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        
-        .menu-category-btn.active { @apply opacity-100 border-cafe-charcoal; }
-        .menu-category-btn.active::after { content: ''; @apply absolute bottom-0 left-0 right-0 h-[2px] bg-cafe-charcoal; }
-
-        html { scroll-behavior: smooth; }
-        
-        /* Image hover effect */
-        .img-zoom { @apply transition-transform duration-1000 scale-105 hover:scale-100; }
-    </style>
 </head>
 <body>
+    <div id="root"></div>
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-8">
-        <div class="max-w-7xl mx-auto px-12 flex justify-between items-center text-cafe-charcoal">
-            <div class="reveal">
-                <span class="text-2xl font-black tracking-tighter uppercase font-serif">Lumière</span>
-            </div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = FramerMotion;
 
-            <div class="hidden md:flex gap-10 label-caps">
-                <a href="#philosophy" class="opacity-40 hover:opacity-100 transition-opacity">Story</a>
-                <a href="#menu" class="opacity-40 hover:opacity-100 transition-opacity">Menu</a>
-                <a href="#location" class="opacity-40 hover:opacity-100 transition-opacity">Location</a>
-            </div>
-
-            <button class="px-6 py-2 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all hidden md:block">
-                Reservations
-            </button>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center px-12 pt-20 overflow-hidden">
-        <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
-            <div class="reveal">
-                <h1 class="text-[70px] md:text-[110px] bold-heading mb-8">
-                    CRAFTED<br />
-                    <span class="italic font-normal text-cafe-oak lowercase">Daily</span><br />
-                    COFFEE.
-                </h1>
-                <p class="max-w-sm text-sm leading-relaxed opacity-70 font-medium mb-12">
-                    An artisanal sanctuary for the restless mind. We source single-origin beans and roast them in small batches for the perfect morning ritual.
-                </p>
-                
-                <!-- Abstract Visual -->
-                <div class="relative w-full h-48 mt-20 hidden md:block">
-                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-cafe-oak rounded-full mix-blend-multiply opacity-10 animate-pulse"></div>
-                    <div class="absolute bottom-10 left-32 w-48 h-48 bg-cafe-charcoal rounded-full"></div>
-                    <div class="absolute bottom-4 left-44 w-32 h-32 border-2 border-cafe-charcoal rounded-full flex items-center justify-center">
-                        <span class="text-[10px] font-black text-center leading-none tracking-tighter uppercase">Roasted<br />In-House</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Spotlight Card -->
-            <div class="reveal" style="animation-delay: 0.2s;">
-                <div class="bg-white rounded-[40px] shadow-2xl p-10 md:p-12 flex flex-col relative z-20">
-                    <div class="flex justify-between items-end border-b border-cafe-latte pb-6 mb-8">
-                        <h2 class="text-3xl font-serif italic font-normal tracking-tight normal-case">Seasonal Selection</h2>
-                        <span class="label-caps opacity-40">Series \'26</span>
-                    </div>
-                    
-                    <div class="space-y-10">
-                        <section>
-                            <h3 class="label-caps mb-6 text-cafe-oak">Signature Liquids</h3>
-                            <div class="space-y-6">
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="font-black text-sm uppercase tracking-tight">Lavender Honey Latte</p>
-                                        <p class="text-[11px] opacity-40 italic mt-1">Single origin, fresh Provence lavender</p>
-                                    </div>
-                                    <span class="font-serif text-lg font-medium">$6.50</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="font-black text-sm uppercase tracking-tight">Sea Salt Cold Brew</p>
-                                        <p class="text-[11px] opacity-40 italic mt-1">18-hour steep, house foam</p>
-                                    </div>
-                                    <span class="font-serif text-lg font-medium">$5.75</span>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section>
-                            <h3 class="label-caps mb-6 text-cafe-oak">Curated Bites</h3>
-                            <div class="space-y-6">
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="font-black text-sm uppercase tracking-tight">Pistachio Croissant</p>
-                                        <p class="text-[11px] opacity-40 italic mt-1">Twice-baked, crushed nuts</p>
-                                    </div>
-                                    <span class="font-serif text-lg font-medium">$7.00</span>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <div class="mt-12 pt-8 flex items-center gap-4 text-[10px] text-gray-400 uppercase tracking-widest font-black border-t border-gray-50">
-                        <div class="h-[1px] flex-1 bg-cafe-latte"></div>
-                        <span>Kitchen Closes 4PM</span>
-                        <div class="h-[1px] flex-1 bg-cafe-latte"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Philosophy -->
-    <section id="philosophy" class="py-32 bg-white">
-        <div class="max-w-7xl mx-auto px-12 grid md:grid-cols-2 gap-20 items-center">
-            <div class="reveal overflow-hidden rounded-[3rem] shadow-xl aspect-[4/5]">
-                <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 hover:scale-100" alt="Process">
-            </div>
-            <div class="reveal" style="animation-delay: 0.3s;">
-                <span class="text-cafe-oak label-caps block mb-6">Our Ritual</span>
-                <h2 class="text-5xl md:text-7xl bold-heading leading-tight mb-8">
-                    Brewing <br />
-                    With <span class="italic font-normal lowercase">Intent.</span>
-                </h2>
-                <p class="text-lg text-cafe-charcoal/70 leading-relaxed mb-10 font-medium">
-                    Lumière is a dialogue between the earth and the cup. We treat every bean with surgical precision and artistic soul.
-                </p>
-                <div class="grid grid-cols-2 gap-8 py-10 border-t border-cafe-latte">
-                    <div>
-                        <span class="block text-3xl font-serif mb-2 italic">Direct</span>
-                        <span class="label-caps opacity-40">Sourcing</span>
-                    </div>
-                    <div>
-                        <span class="block text-3xl font-serif mb-2 italic">Daily</span>
-                        <span class="label-caps opacity-40">Small Batch</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Interactive Menu -->
-    <section id="menu" class="py-40 bg-cafe-cream">
-        <div class="max-w-4xl mx-auto px-12 text-center mb-20 reveal">
-            <span class="label-caps text-cafe-oak mb-4 block">The Full Collection</span>
-            <h2 class="text-6xl md:text-8xl bold-heading mb-8">Curated <span class="italic font-normal lowercase">Liquids</span></h2>
-            
-            <div class="flex justify-center gap-12 border-b border-cafe-latte pb-4">
-                <button onclick="switchMenu('coffee')" class="menu-category-btn label-caps pb-2 relative active transition-all opacity-30" id="btn-coffee">Coffee</button>
-                <button onclick="switchMenu('bakery')" class="menu-category-btn label-caps pb-2 relative transition-all opacity-30" id="btn-bakery">Bakery</button>
-                <button onclick="switchMenu('kitchen')" class="menu-category-btn label-caps pb-2 relative transition-all opacity-30" id="btn-kitchen">Kitchen</button>
-            </div>
-        </div>
-
-        <div id="item-grid" class="max-w-4xl mx-auto px-12 grid md:grid-cols-2 gap-x-20 gap-y-12">
-            <!-- Items loaded by JS -->
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="location" class="py-40 bg-cafe-charcoal text-cafe-cream">
-        <div class="max-w-7xl mx-auto px-12 grid md:grid-cols-3 gap-24">
-            <div class="space-y-10 reveal">
-                <span class="text-3xl font-black uppercase serif tracking-tighter">Lumière</span>
-                <p class="text-cafe-cream/50 leading-relaxed font-medium text-sm italic">
-                    An architectural exploration of taste. Intersection of craft and minimalism.
-                </p>
-                <div class="flex gap-8 label-caps opacity-50">
-                    <span class="underline italic cursor-pointer">Instagram</span>
-                    <span class="underline italic cursor-pointer">Journal</span>
-                </div>
-            </div>
-
-            <div class="space-y-10 reveal" style="animation-delay: 0.2s;">
-                <h4 class="label-caps text-cafe-oak">The Flagship</h4>
-                <div class="space-y-6 font-medium text-cafe-cream/70 italic text-sm">
-                    <p>124 Arts District West, <br />San Francisco, CA 94103</p>
-                    <p>Daily — 08:00 to 18:00 <br />Kitchen — Closes 16:00</p>
-                </div>
-            </div>
-
-            <div class="bg-white/5 p-12 rounded-[40px] border border-white/10 reveal" style="animation-delay: 0.4s;">
-                <h4 class="text-2xl font-serif mb-6 italic font-normal normal-case">Private Journal</h4>
-                <div class="relative">
-                    <input type="email" placeholder="EMAIL ADDRESS" class="w-full bg-transparent border-b border-white/20 pb-4 text-[10px] label-caps focus:outline-none focus:border-cafe-oak transition-colors">
-                    <button class="absolute right-0 top-0 label-caps text-cafe-oak">Join</button>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto px-12 mt-32 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between label-caps opacity-20">
-            <span>© 2026 Lumière Collective</span>
-            <span>Crafted with precision</span>
-        </div>
-    </footer>
-
-    <script>
-        const MENU_DATA = {
-            coffee: [
-                { name: "Gold Leaf Espresso", price: "5.50", desc: "Single origin beans, double shot" },
-                { name: "Lavender Honey Latte", price: "6.25", desc: "Provence lavender & wildflower honey" },
-                { name: "Salted Cream Cold Brew", price: "5.75", desc: "18-hour steep, house-made sea salt foam" },
-                { name: "Ceremonial Matcha", price: "6.50", desc: "Uji grade matcha with oat silk milk" },
-            ],
-            bakery: [
-                { name: "Pistachio Croissant", price: "7.00", desc: "Double baked, Sicilian cream" },
-                { name: "Charcoal Pain Chocolat", price: "5.50", desc: "Valrhona chocolate, active charcoal" },
-                { name: "Rose Petal Financier", price: "4.50", desc: "Brown butter with dried roses" },
-            ],
-            kitchen: [
-                { name: "Truffle Cloud Eggs", price: "16.50", desc: "Whipped whites, yolk confit, fresh truffle" },
-                { name: "Saffron Salmon Tartine", price: "18.00", desc: "Cold smoked salmon, saffron labneh" },
-            ],
+        // Custom Component for Lucide Icons in Standalone
+        const Icon = ({ name, className = "w-6 h-6", ...props }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name} className={className} {...props}></i>;
         };
 
-        function switchMenu(cat) {
-            const grid = document.getElementById('item-grid');
-            const btns = document.querySelectorAll('.menu-category-btn');
-            
-            // UI Update
-            btns.forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-' + cat).classList.add('active');
-            
-            // Filter Data
-            grid.style.opacity = '0';
-            setTimeout(() => {
-                grid.innerHTML = MENU_DATA[cat].map(item => `
-                    <div class="group cursor-default border-b border-cafe-latte pb-8">
-                        <div class="flex justify-between items-baseline mb-3">
-                            <h3 class="text-lg font-black uppercase tracking-tight group-hover:text-cafe-oak transition-colors">${item.name}</h3>
-                            <span class="font-serif text-lg">$${item.price}</span>
+        const MENU_DATA = {
+            "Specialty Coffee": [
+                { name: "Gold Leaf Espresso", price: "450", desc: "Single origin roasted beans, double shot, edible 24k gold garnish" },
+                { name: "Lavender Honey Latte", price: "525", desc: "Infused with organic Provence lavender & wildflower honey" },
+                { name: "Salted Cream Cold Brew", price: "475", desc: "18-hour steep, house-made sea salt foam topper" },
+                { name: "Spanish Latte", price: "420", desc: "Condensed milk sweetness with balanced espresso strength" },
+                { name: "Rosemary Charcoal Latte", price: "550", desc: "Activated charcoal, rosemary infusion, almond milk" },
+            ],
+            "Teas & Matcha": [
+                { name: "Ceremonial Matcha", price: "590", desc: "Grade A Uji matcha whisked with oat silk milk" },
+                { name: "Persian Rose Tea", price: "380", desc: "Dried Iranian roses, hand-plucked tea leaves" },
+                { name: "Butterfly Pea Lemonade", price: "350", desc: "Color-changing botanical tea with fresh citrus" },
+                { name: "Smoked Oolong", price: "440", desc: "Traditional charcoal-fired tea from Wuyi mountains" },
+            ],
+            "Artisanal Bakery": [
+                { name: "Pistachio Croissant", price: "320", desc: "Double baked, Sicilian pistachio cream filling" },
+                { name: "Charcoal Pain au Chocolat", price: "280", desc: "Valrhona 70% dark chocolate, activated charcoal dough" },
+                { name: "Truffle Cheese Danish", price: "450", desc: "Flaky pastry, black truffle honey, aged gruyère" },
+                { name: "Sourdough Cardamom Knot", price: "260", desc: "Stone-ground flour, organic cardamom spice" },
+            ],
+            "All-Day Brunch": [
+                { name: "Truffle Cloud Eggs", price: "850", desc: "Whipped egg whites, yolk confit, fresh shaved truffle" },
+                { name: "Saffron Salmon Tartine", price: "1200", desc: "Cold smoked salmon, saffron labneh, pickled shallots" },
+                { name: "Mushroom Umami Bowl", price: "780", desc: "Wild foraged mushrooms, quinoa, miso-tahini dressing" },
+                { name: "Avocado Burrata Toast", price: "950", desc: "Hass avocado, fresh burrata, heirloom tomatoes, balsamic glaze" },
+                { name: "Brioche French Toast", price: "680", desc: "Thick cut brioche, vanilla bean cream, macerated berries" },
+            ]
+        };
+
+        const PAGES = ['Home', 'Menu', 'Gallery', 'About', 'Contact'];
+
+        function App() {
+            const [currentPage, setCurrentPage] = useState('Home');
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [isScrolled, setIsScrolled] = useState(false);
+            const [activeCategory, setActiveCategory] = useState("Specialty Coffee");
+
+            useEffect(() => {
+                const handleScroll = () => setIsScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const pageVariants = {
+                initial: { opacity: 0, x: 20 },
+                animate: { opacity: 1, x: 0 },
+                exit: { opacity: 0, x: -20 }
+            };
+
+            const Nav = () => (
+                <nav className={`fixed w-full z-50 transition-all duration-700 ${isScrolled ? 'glass-nav py-4' : 'bg-transparent py-8'}`}>
+                    <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center text-cafe-charcoal">
+                        <motion.div 
+                            className="cursor-pointer"
+                            onClick={() => setCurrentPage('Home')}
+                            whileHover={{ scale: 1.05 }}
+                        >
+                            <span className="text-2xl font-black tracking-tighter uppercase serif">Lumière</span>
+                        </motion.div>
+
+                        <div className="hidden md:flex gap-10 label-caps">
+                            {PAGES.map((page) => (
+                                <button 
+                                    key={page} 
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`transition-all ${currentPage === page ? 'opacity-100 text-cafe-oak underline underline-offset-8' : 'opacity-40 hover:opacity-100'}`}
+                                >
+                                    {page}
+                                </button>
+                            ))}
                         </div>
-                        <p class="text-xs leading-relaxed opacity-50 font-medium italic">${item.desc}</p>
+
+                        <button 
+                            className="md:hidden text-cafe-charcoal"
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        >
+                            {isMenuOpen ? <Icon name="x" /> : <Icon name="menu" />}
+                        </button>
+
+                        <button className="hidden md:block px-6 py-2 border border-cafe-charcoal rounded-full label-caps hover:bg-cafe-charcoal hover:text-cafe-cream transition-all uppercase">
+                            Reservations
+                        </button>
                     </div>
-                `).join('');
-                grid.style.opacity = '1';
-                grid.classList.add('reveal');
-            }, 300);
+                </nav>
+            );
+
+            const Home = () => (
+                <div className="pt-20">
+                    <section className="relative min-h-[90vh] flex items-center px-6 md:px-12 overflow-hidden">
+                        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+                            <motion.div
+                                initial={{ opacity: 0, x: -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 1.2 }}
+                            >
+                                <h1 className="text-[60px] md:text-[120px] bold-heading uppercase leading-[0.8] mb-8">
+                                    A Taste of<br />
+                                    <span className="italic font-normal text-cafe-oak">Heaven</span><br />
+                                    Daily.
+                                </h1>
+                                <p className="max-w-sm text-sm leading-relaxed opacity-70 font-medium mb-12">
+                                    Lumière is an artisanal sanctuary for those who seek perfection in every sip and tranquility in every moment.
+                                </p>
+                                <button 
+                                    onClick={() => setCurrentPage('Menu')}
+                                    className="flex items-center gap-4 label-caps text-cafe-charcoal hover:text-cafe-oak transition-colors group"
+                                >
+                                    Explore the menu <Icon name="arrow-right" className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                                </button>
+                            </motion.div>
+
+                            <div className="relative group">
+                                <motion.div 
+                                   initial={{ opacity: 0, scale: 0.8 }}
+                                   animate={{ opacity: 1, scale: 1 }}
+                                   transition={{ duration: 1.5 }}
+                                   className="aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl relative z-10"
+                                >
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop" 
+                                        className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
+                                        alt="Cafe Space"
+                                    />
+                                </motion.div>
+                                <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-cafe-oak/10 rounded-full blur-3xl -z-10 animate-pulse" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="py-32 px-6 md:px-12">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="flex justify-between items-end mb-20">
+                                <h2 className="text-4xl md:text-6xl bold-heading">House <br /><span className="italic font-normal">Favorites</span></h2>
+                                <button onClick={() => setCurrentPage('Menu')} className="label-caps opacity-40 hover:opacity-100 flex items-center gap-2">Full Menu <Icon name="chevron-right" className="w-4 h-4" /></button>
+                            </div>
+                            <div className="grid md:grid-cols-3 gap-8">
+                                {[1, 2, 3].map((i) => (
+                                    <motion.div 
+                                        key={i}
+                                        whileHover={{ y: -10 }}
+                                        className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all"
+                                    >
+                                        <div className="h-64 bg-cafe-latte rounded-2xl overflow-hidden mb-6">
+                                            <img 
+                                                src={i === 1 ? "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=1934&auto=format&fit=crop" : i === 2 ? "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop" : "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop"}
+                                                className="w-full h-full object-cover"
+                                                alt="Product"
+                                            />
+                                        </div>
+                                        <h3 className="text-xl font-black uppercase tracking-tight mb-2">Signature 0{i}</h3>
+                                        <p className="text-xs opacity-50 font-medium italic mb-4">Limited seasonal batch sourced from high-altitude estates.</p>
+                                        <span className="text-cafe-oak font-bold text-lg">₹450</span>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+
+            const Menu = () => (
+                <div className="pt-40 px-6 md:px-12 pb-32">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center mb-24">
+                            <span className="label-caps text-cafe-oak mb-4 block">The Full Collection</span>
+                            <h1 className="text-7xl md:text-9xl bold-heading uppercase">Menu</h1>
+                        </div>
+
+                        <div className="flex overflow-x-auto gap-8 md:gap-12 border-b border-cafe-latte pb-4 mb-20 no-scrollbar">
+                            {Object.keys(MENU_DATA).map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`label-caps whitespace-nowrap transition-all relative pb-4 ${activeCategory === cat ? 'text-cafe-charcoal opacity-100' : 'opacity-30 hover:opacity-100'}`}
+                                >
+                                    {cat}
+                                    {activeCategory === cat && (
+                                        <motion.div layoutId="underline" className="absolute bottom-0 left-0 right-0 h-[2px] bg-cafe-charcoal" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-x-20 gap-y-16">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeCategory}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="contents"
+                                >
+                                    {MENU_DATA[activeCategory].map((item, idx) => (
+                                        <div key={idx} className="group border-b border-cafe-latte pb-10">
+                                            <div className="flex justify-between items-baseline mb-4">
+                                                <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:text-cafe-oak transition-colors">{item.name}</h3>
+                                                <span className="font-serif text-2xl font-light">₹{item.price}</span>
+                                            </div>
+                                            <p className="text-sm leading-relaxed opacity-50 font-medium italic">{item.desc}</p>
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const Gallery = () => (
+                <div className="pt-40 px-6 md:px-12 pb-32">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="mb-24">
+                            <h1 className="text-6xl md:text-8xl bold-heading uppercase">Space <br /><span className="italic font-normal">Philosophy</span></h1>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {[
+                                "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2047&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=2070&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1974&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?q=80&w=1934&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1974&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1974&auto=format&fit=crop",
+                                "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?q=80&w=2071&auto=format&fit=crop"
+                            ].map((url, i) => (
+                                <motion.div 
+                                    key={i}
+                                    initial={{ opacity: 0 }}
+                                    whileInView={{ opacity: 1 }}
+                                    viewport={{ once: true }}
+                                    className={`rounded-3xl overflow-hidden shadow-lg aspect-square ${i === 2 || i === 5 ? 'md:col-span-2' : ''}`}
+                                >
+                                    <img src={url} className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" alt="Gallery" />
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const About = () => (
+                <div className="pt-40 px-6 md:px-12 pb-32">
+                    <div className="max-w-4xl mx-auto">
+                        <h1 className="text-6xl md:text-8xl bold-heading uppercase mb-12">Our <br /><span className="italic font-normal">Aura</span></h1>
+                        <div className="flex flex-col gap-12 font-medium text-xl leading-relaxed text-cafe-charcoal/80">
+                            <p>Founded in 2024, Lumière was born from a singular obsession: the architecture of taste. We believe that the space you inhabit while drinking your morning coffee is just as important as the roast itself.</p>
+                            <img src="https://images.unsplash.com/photo-1600100414328-98e94553229b?q=80&w=2070&auto=format&fit=crop" className="w-full h-[500px] object-cover rounded-[3rem] my-10" alt="Founder" />
+                            <p>Our beans are selected through a rigorous process of direct trade, ensuring that the farmers who labor over the soil receive the respect and compensation they deserve.</p>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const Contact = () => (
+                <div className="pt-40 px-6 md:px-12 pb-32">
+                    <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 md:gap-32 items-center">
+                        <div>
+                            <h1 className="text-6xl md:text-8xl bold-heading uppercase mb-12">Reach <br /><span className="italic font-normal">Out</span></h1>
+                            <div className="space-y-12">
+                                <div className="flex gap-6 items-center group">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                        <Icon name="mail" className="text-cafe-oak" />
+                                    </div>
+                                    <div>
+                                        <span className="label-caps opacity-40">Email</span>
+                                        <p className="text-xl md:text-2xl font-serif italic">hello@lumiere.cafe</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-6 items-center group">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                        <Icon name="phone" className="text-cafe-oak" />
+                                    </div>
+                                    <div>
+                                        <span className="label-caps opacity-40">Call</span>
+                                        <p className="text-xl md:text-2xl font-serif italic">+91 98765 43210</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-6 items-center group">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                        <Icon name="map-pin" className="text-cafe-oak" />
+                                    </div>
+                                    <div>
+                                        <span className="label-caps opacity-40">Flagship</span>
+                                        <p className="text-xl md:text-2xl font-serif italic">Bandra West, Mumbai</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white p-10 md:p-14 rounded-[40px] shadow-2xl">
+                            <h2 className="text-4xl bold-heading mb-10 uppercase">Message</h2>
+                            <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+                                <input type="text" placeholder="NAME" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors label-caps bg-transparent" />
+                                <input type="email" placeholder="EMAIL" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors label-caps bg-transparent" />
+                                <textarea placeholder="YOUR MESSAGE" rows="3" className="w-full border-b border-cafe-latte pb-4 focus:outline-none focus:border-cafe-oak transition-colors label-caps bg-transparent" />
+                                <button className="w-full bg-cafe-charcoal text-cafe-cream py-6 rounded-full label-caps hover:scale-105 transition-transform">Send Signal</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="bg-cafe-cream min-h-screen selection:bg-cafe-oak/30">
+                    <Nav />
+                    
+                    <AnimatePresence>
+                        {isMenuOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, x: '100%' }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: '100%' }}
+                                className="fixed inset-0 z-[60] bg-cafe-cream flex flex-col p-12 md:hidden"
+                            >
+                                <button className="self-end mb-20 p-2" onClick={() => setIsMenuOpen(false)}>
+                                    <Icon name="x" className="w-10 h-10" />
+                                </button>
+                                <div className="flex flex-col gap-8">
+                                    {PAGES.map((page) => (
+                                        <button 
+                                            key={page} 
+                                            onClick={() => { setCurrentPage(page); setIsMenuOpen(false); }}
+                                            className="text-5xl bold-heading uppercase text-left"
+                                        >
+                                            <span className={`${currentPage === page ? 'text-cafe-oak italic' : 'opacity-40'}`}>{page}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <AnimatePresence mode="wait">
+                        <motion.main
+                            key={currentPage}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            variants={pageVariants}
+                            transition={{ duration: 0.6 }}
+                        >
+                            {currentPage === 'Home' && <Home />}
+                            {currentPage === 'Menu' && <Menu />}
+                            {currentPage === 'Gallery' && <Gallery />}
+                            {currentPage === 'About' && <About />}
+                            {currentPage === 'Contact' && <Contact />}
+                        </motion.main>
+                    </AnimatePresence>
+
+                    <footer className="py-24 bg-cafe-charcoal text-cafe-cream px-6 md:px-12 mt-20">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
+                            <span className="text-3xl font-black serif uppercase tracking-tighter">Lumière</span>
+                            <div className="flex flex-wrap justify-center gap-8 md:gap-12 label-caps opacity-50">
+                                {PAGES.map(p => <button key={p} onClick={() => setCurrentPage(p)} className="hover:opacity-100 transition-opacity">{p}</button>)}
+                            </div>
+                            <div className="flex gap-6">
+                                <Icon name="instagram" className="w-5 h-5 opacity-40 hover:opacity-100 cursor-pointer" />
+                                <Icon name="external-link" className="w-5 h-5 opacity-40 hover:opacity-100 cursor-pointer" />
+                            </div>
+                        </div>
+                        <div className="max-w-7xl mx-auto mt-20 pt-10 border-t border-white/5 text-center label-caps opacity-20 text-[9px]">
+                            © 2026 Lumière Collective • Mumbai • Bangalore • New Delhi
+                        </div>
+                    </footer>
+                </div>
+            );
         }
 
-        // Navbar Scroll Effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if(window.scrollY > 50) {
-                nav.classList.add('glass-nav');
-                nav.style.padding = '1rem 0';
-            } else {
-                nav.classList.remove('glass-nav');
-                nav.style.padding = '2rem 0';
-            }
-        });
-
-        // Initial Load
-        window.onload = () => switchMenu('coffee');
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
